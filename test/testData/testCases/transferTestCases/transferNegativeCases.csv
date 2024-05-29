@@ -1,0 +1,5 @@
+﻿id,isActive,username,from_account_alias,to_account_alias,transfer_amount,description,expect_error_message
+1,1,user6,default,savings601,0,[Zero Amount] transfer 0 amount,Amount must be greater than 0
+2,1,user7,default,savings701,-1,[Negative Amount] transfer negative amount,Amount must be greater than 0
+3,1,user8,default,savings801,1000000,[More than available],Insufficient funds
+4,1,user9,default,default,1,[Same Account] Transfere an mount from the same amount to the same amount,Same account transfer is not allowed

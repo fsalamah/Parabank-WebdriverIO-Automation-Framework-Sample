@@ -1,0 +1,120 @@
+version: '3.8'
+
+services:
+  # Service for Parabank application
+  ParabankService:
+    container_name: "parabank"
+    image: parasoft/parabank
+    ports:
+      - "8080:8080"  # Expose Parabank web interface
+      - "61616:61616"  # Expose Parabank JMS port
+      - "9001:9001"  # Expose Parabank admin interface
+    networks:
+      - qa_network
+    healthcheck:  # Health check configuration for ParabankService
+      test: ["CMD", "curl", "-f", "http://localhost:8080/parabank"]  # Check if Parabank is reachable
+      interval: 30s    # Check health every 30 seconds
+      timeout: 10s     # Timeout after 10 seconds
+      retries: 3       # Retry 3 times before considering the service unhealthy
+    deploy:
+      resources:
+        limits:
+          memory: 512mb  # Limit memory usage to 512MB
+
+  # Service for Selenium Hub
+  HubService:
+    image: selenium/hub:4.21.0
+    container_name: seleniumHub
+    ports:
+      - "4445:4444"  # Expose Selenium Hub web interface
+      - "4442:4442"  # Expose event bus for publishing
+      - "4443:4443"  # Expose event bus for subscribing
+    networks:
+      - qa_network
+    depends_on:
+      - ParabankService  # Ensure ParabankService is started before this service
+    healthcheck:  # Health check configuration for HubService
+      test: ["CMD", "curl", "-f", "http://localhost:4444/wd/hub/status"]  # Check if Selenium Hub is reachable
+      interval: 30s    # Check health every 30 seconds
+      timeout: 10s     # Timeout after 10 seconds
+      retries: 3       # Retry 3 times before considering the service unhealthy
+    deploy:
+      resources:
+        limits:
+          memory: 512mb  # Limit memory usage to 512MB
+
+  # Service for Selenium Chrome Node
+  ChromeService:
+    image: selenium/node-chrome:125.0-20240522
+    ports:
+      - "5900:5900"
+      - "7900:7900"
+    environment:
+      - SE_EVENT_BUS_HOST=seleniumHub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_SESSIONS=10
+    depends_on:
+      - HubService
+    networks:
+      - qa_network
+    deploy:
+      resources:
+        limits:
+          memory: 512mb
+
+  # Service for Allure report generation
+  allure:
+    image: "frankescobar/allure-docker-service"
+    environment:
+      CHECK_RESULTS_EVERY_SECONDS: 1
+      KEEP_HISTORY: 1
+    ports:
+      - "5050:5050"
+    volumes:
+      - ./allure-results:/app/allure-results
+      - ./allure-reports:/app/default-reports
+    networks:
+      - allure_network
+    deploy:
+      resources:
+        limits:
+          memory: 256M  # Limit memory usage to 256MB
+
+  # Service for Allure report UI
+  allure-ui:
+    image: "frankescobar/allure-docker-service-ui"
+    environment:
+      ALLURE_DOCKER_PUBLIC_API_URL: "http://localhost:5050"
+    ports:
+      - "5252:5252"
+    networks:
+      - allure_network
+    deploy:
+      resources:
+        limits:
+          memory: 256M  # Limit memory usage to 256MB
+
+  # Service for running WDIO tests
+  WdioService:
+    image: wdio-test:latest
+    container_name: "wdio-allure-grid"
+    depends_on:
+      - ParabankService
+      - HubService
+      - ChromeService
+    volumes:
+      - ./test:/usr/app/test
+      - ./allure-results:/usr/app/allure-results
+    networks:
+      - qa_network
+    deploy:
+      resources:
+        limits:
+          memory: 256M  # Limit memory usage to 256MB
+
+networks:
+  qa_network:
+    driver: bridge
+  allure_network:
+    driver: bridge
