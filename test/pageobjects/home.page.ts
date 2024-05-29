@@ -1,4 +1,3 @@
-import { PagePaths } from "../Constants/constants.ts";
 import Page from "./page.ts";
 import { $ } from '@wdio/globals'
 //a[text()="Open New Account"]

@@ -1,7 +1,7 @@
 
   export interface BaseTestData {
     id: string;
-    isActive: boolean;
+    isActive: string;
     username: string;
     description?: string; // Optional attribute
   }
@@ -29,4 +29,8 @@
     transfer_amount: number;
     description: string;
     expect_error_message: string; // Optional field for expected error message
+}
+export interface ParabankConfig  {
+  minBalanceAmount: number;
+  initialBalanceAmount: number;
 }

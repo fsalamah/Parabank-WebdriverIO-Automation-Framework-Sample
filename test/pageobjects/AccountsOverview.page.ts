@@ -1,4 +1,4 @@
-import { BankAccount } from "../types/BankAccount";
+import { BankAccount } from "../types/BankAccount.ts";
 import MoneyHelper from "../utilities/MoneyHelper.ts";
 import Page from "./page.ts";
 
@@ -15,20 +15,20 @@ class AccountsOverview extends Page{
         // Get the table rows excluding the last row (Totals) and the header row
         
 
-        let result: BankAccount[] = [];
+        const result: BankAccount[] = [];
 
        //await browser.waitUntil(async ()=>await $$('//table/tbody/tr[position() < last()]/td').length>2 ,{timeout:10000,timeoutMsg:"accounts page didn't show any accounts for the user"}).catch(p=>{})
        
        
         await expect(await $$('//table/tbody/tr[position() < last()]/td')).toBeElementsArrayOfSize({gte:3,message:"Accouts overview page didn't display the customer accounts!"});
         
-        let accountRows =await   $$('//table/tbody/tr[position() < last()]');
+        const accountRows =await   $$('//table/tbody/tr[position() < last()]');
         // Iterate over each row and extract account information
         
          await   accountRows.map(async (row)=> {
-            let idText = await row.$("./td[1]").getText();
-            let balanceText = await row.$("./td[2]").getText();
-            let availableBalanceText = await row.$("./td[3]").getText();
+            const idText = await row.$("./td[1]").getText();
+            const balanceText = await row.$("./td[2]").getText();
+            const availableBalanceText = await row.$("./td[3]").getText();
 
             // Create a BankAccount object and add it to the result array
             result.push({

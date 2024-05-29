@@ -4,6 +4,7 @@ services:
   # Service for Parabank application
   ParabankService:
     container_name: "parabank"
+    shm_size: 1gb
     image: parasoft/parabank
     ports:
       - "8080:8080"  # Expose Parabank web interface
@@ -16,14 +17,12 @@ services:
       interval: 30s    # Check health every 30 seconds
       timeout: 10s     # Timeout after 10 seconds
       retries: 3       # Retry 3 times before considering the service unhealthy
-    deploy:
-      resources:
-        limits:
-          memory: 512mb  # Limit memory usage to 512MB
+
 
   # Service for Selenium Hub
   HubService:
     image: selenium/hub:4.21.0
+    shm_size: 1gb
     container_name: seleniumHub
     ports:
       - "4445:4444"  # Expose Selenium Hub web interface
@@ -38,14 +37,12 @@ services:
       interval: 30s    # Check health every 30 seconds
       timeout: 10s     # Timeout after 10 seconds
       retries: 3       # Retry 3 times before considering the service unhealthy
-    deploy:
-      resources:
-        limits:
-          memory: 512mb  # Limit memory usage to 512MB
+
 
   # Service for Selenium Chrome Node
   ChromeService:
     image: selenium/node-chrome:125.0-20240522
+    shm_size: 1gb
     ports:
       - "5900:5900"
       - "7900:7900"
@@ -58,10 +55,7 @@ services:
       - HubService
     networks:
       - qa_network
-    deploy:
-      resources:
-        limits:
-          memory: 512mb
+
 
   # Service for Allure report generation
   allure:
@@ -76,10 +70,7 @@ services:
       - ./allure-reports:/app/default-reports
     networks:
       - allure_network
-    deploy:
-      resources:
-        limits:
-          memory: 256M  # Limit memory usage to 256MB
+
 
   # Service for Allure report UI
   allure-ui:
@@ -90,14 +81,12 @@ services:
       - "5252:5252"
     networks:
       - allure_network
-    deploy:
-      resources:
-        limits:
-          memory: 256M  # Limit memory usage to 256MB
+
 
   # Service for running WDIO tests
   WdioService:
     image: wdio-test:latest
+    shm_size: 1gb
     container_name: "wdio-allure-grid"
     depends_on:
       - ParabankService
@@ -108,10 +97,6 @@ services:
       - ./allure-results:/usr/app/allure-results
     networks:
       - qa_network
-    deploy:
-      resources:
-        limits:
-          memory: 256M  # Limit memory usage to 256MB
 
 networks:
   qa_network:

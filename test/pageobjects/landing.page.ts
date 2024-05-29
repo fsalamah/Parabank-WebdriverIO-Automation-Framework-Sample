@@ -1,4 +1,3 @@
-import { PagePaths } from "../Constants/constants.ts";
 import Page from "./page.ts";
 
 class LandingPage extends Page

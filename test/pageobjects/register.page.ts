@@ -45,11 +45,11 @@ class RegisterPage extends Page
         return $('[value="Register"]')
     }
 
-    public open()
+    public open():Promise<string>
     {        
        return super.openRoute(PagePaths.register);
     }
-    public  registerUser(username:string, password:string, repeatPassword:string)
+    public  registerUser(username:string, password:string, repeatPassword:string):Promise<void>
     { 
         return Promise.all([
         this.firstNameText.setValue(faker.person.firstName()),

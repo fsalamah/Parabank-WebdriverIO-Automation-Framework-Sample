@@ -218,10 +218,12 @@ export const config: Options.Testrunner = {
      */
     before: async function (capabilities, specs) {
 
+        
+
         await SetupTestEnvironment();
-
-
-
+        
+        await browser.maximizeWindow();
+      
     },
     /**
      * Runs before a WebdriverIO command gets executed.

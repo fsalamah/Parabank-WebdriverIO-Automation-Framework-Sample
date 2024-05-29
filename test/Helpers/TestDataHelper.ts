@@ -1,7 +1,8 @@
+
 import AllureReporter from "@wdio/allure-reporter";
 import HomePage from "../pageobjects/home.page.ts";
 import LoginPage from "../pageobjects/login.page.ts";
-import { BankAccountTestData, UserTestData } from "../types/TestDataRecordTypes.ts";
+import { BankAccountTestData, UserTestData } from "../types/Interfaces.ts";
 import { User } from "../types/User.ts";
 import openNewAccountPage from "../pageobjects/openNewAccount.page.ts";
 import { BankAccount } from "../types/BankAccount.ts";
@@ -11,10 +12,11 @@ import AccountsOverviewPage from "../pageobjects/AccountsOverview.page.ts";
 import adminPage from "../pageobjects/admin.page.ts";
 import csvReaderUtility from "../utilities/csvReaderUtility.ts";
 import { TestDataFiles } from "../Constants/constants.ts";
-import LandingPage from "../pageobjects/landing.page.ts";
 import { config } from "../../wdio.conf.ts";
+import ParabankConfig from '../testData/prerequisites/parabankConfig.json' with { type: "json" };;
 
-export let users: User[] = [];
+
+export let usersPrerequisiteData: User[] = [];
 
 export async function Login(username: string, password: string): Promise<void> {
   await LoginPage.open();
@@ -38,7 +40,7 @@ async function CreateUserBankAccounts(username: string, userAccounts: BankAccoun
   AllureReporter.startStep(`Create user ${username} bank accounts`);
 
   // Loop through test data matching the username
-  for (const account of accountsTestData.filter((p: any) => p.username === username)) {
+  for (const account of accountsTestData.filter((p: BankAccountTestData) => p.username === username)) {
     AllureReporter.startStep(`Creating account ${account.account_alias} (${account.account_type}) from account ${account.created_from}`);
 
     // Open a new account using the specified details
@@ -64,59 +66,62 @@ async function CreateUserBankAccounts(username: string, userAccounts: BankAccoun
   return userAccounts;
 }
 
-function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 export async function SetupTestEnvironment() {
   try {
 
     await browser.navigateTo(config.baseUrl!);
     
-    
-    await adminPage.open();      
-    await browser.refresh();
-    await browser.saveScreen('././allure-results/before_start.png');
-    await adminPage.cleanAndInitialize(1000, 10000);
-    let usersTestData = csvReaderUtility.loadTestData(TestDataFiles.PrerequisiteTestData.usersTestData);
-    let accountsTestData = csvReaderUtility.loadTestData(TestDataFiles.PrerequisiteTestData.accountsTestData);
-    users = await CreatePrerequisiteTestData(usersTestData, accountsTestData);
-    
+
+    await adminPage.open();
+
+    await adminPage.cleanAndInitialize(ParabankConfig.minBalanceAmount, ParabankConfig.initialBalanceAmount);
+    const usersTestData = csvReaderUtility.loadTestData<UserTestData>(TestDataFiles.PrerequisiteTestData.usersTestData);
+    const accountsTestData = csvReaderUtility.loadTestData<BankAccountTestData>(TestDataFiles.PrerequisiteTestData.accountsTestData);
+    usersPrerequisiteData = await CreatePrerequisiteTestData(usersTestData, accountsTestData);
+
   }
   catch (error) {
-    
+
     console.error('Aborting test! error in test setup:', error);
     throw error;
   }
 }
 async function CreatePrerequisiteTestData(usersTestData: UserTestData[], accountsTestData: BankAccountTestData[]): Promise<User[]> {
 
-  let result: User[] = [];
-  for (let user of usersTestData!) {
+  const result: User[] = [];
+  for (const user of usersTestData!) {
 
-    let newUser
-    let userAccounts
+    let newUser;
+    let userAccounts;
 
-    AllureReporter.startStep(`Create user ${user.username} prerequisite test data`);
-    AllureReporter.startStep(`Register User  ${user.username}`);
+
+    console.log(`Register User  ${user.username}`)
     await RegisterPage.open();
     await RegisterPage.registerUser(user.username, user.password, user.password);
-    AllureReporter.endStep();
 
 
-    AllureReporter.addStep(`Identify user ${user.username} default (initial) bank account account id and initialize`);
+
+    console.log(`Identify user ${user.username} default (initial) bank account account id`);
     await HomePage.navAccountsOverview.click();
     //identify the initial (Default) account and give it the alias default
     userAccounts = await AccountsOverviewPage.getAccounts();
+    //assign the alias default to the first (initial account) of the user right after registration
     userAccounts[0].accountAlias = "default";
+    //create the user test object
     newUser = new User(user.username, user.password, userAccounts!);
-    AllureReporter.endStep();
 
+    //Create the user test bank accounts
     newUser.accounts = await CreateUserBankAccounts(newUser.username, newUser.accounts, accountsTestData);
+    //push the user to the list to be used within test cases 
     result.push(newUser);
 
+    console.log("logging out!");
+
+    //log out the user 
     await HomePage.navLogOut.click();
-    AllureReporter.endStep();
+
+
+
 
   }
 

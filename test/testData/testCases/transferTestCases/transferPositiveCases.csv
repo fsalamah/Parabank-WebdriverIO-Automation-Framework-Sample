@@ -1,11 +1,11 @@
 id,isActive,username,from_account_alias,to_account_alias,transfer_amount,description,expect_transfer_amount
-1,1,user1,default,savings101,100,[Account Types][Default to Savings] transfer from default (Checking) account to savings account,100.00
-2,1,user1,default,savings101,100,[Account Types][Default to Checking] transfer from default (Checking) account to checking account,100.00
-3,1,user1,savings101,checking101,100,[Account Types][Saving to Checking] transfer from savings to checking account,100.00
-4,1,user1,checking101,savings101,100,[Account Types][Checking to Saving] transfer from checking to savings account,100.00
-5,1,user1,savings101,default,100,[Account Types][Saving to Default] transfer from savings to default (Checking) account,100.00
-6,1,user1,savings101,default,100,[Account Types][Checking to Default] transfer from checking to default (Checking) account,100.00
-7,1,user1,savings101,savings102,100,[Account Types][Saving to Saving] transfer from savings to another savings account,100.00
-8,1,user1,checking101,checking102,100,[Account Types][Checking to Checking] transfer from Checking to another Checking account,100.00
-10,1,user2,default,savings201,1.1255,[Rounding][Round Up] transfer should round amounts to the nearest second decimal digit (round up),1.13
-11,1,user3,default,savings301,1.1245,[Rounding][Round Down] transfer should round amounts to the nearest second decimal digit (round down),1.12
+1,TRUE,user1,default,savings101,100,[Account Types][Default to Savings] transfer from default (Checking) account to savings account,100
+2,TRUE,user1,default,savings101,100,[Account Types][Default to Checking] transfer from default (Checking) account to checking account,100
+3,TRUE,user1,savings101,checking101,100,[Account Types][Saving to Checking] transfer from savings to checking account,100
+4,TRUE,user1,checking101,savings101,100,[Account Types][Checking to Saving] transfer from checking to savings account,100
+5,TRUE,user1,savings101,default,100,[Account Types][Saving to Default] transfer from savings to default (Checking) account,100
+6,TRUE,user1,savings101,default,100,[Account Types][Checking to Default] transfer from checking to default (Checking) account,100
+7,TRUE,user1,savings101,savings102,100,[Account Types][Saving to Saving] transfer from savings to another savings account,100
+8,TRUE,user1,checking101,checking102,100,[Account Types][Checking to Checking] transfer from Checking to another Checking account,100
+10,TRUE,user2,default,savings201,1.1255,[Rounding][Round Up] transfer should round amounts to the nearest second decimal digit (round up),1.13
+11,TRUE,user3,default,savings301,1.1245,[Rounding][Round Down] transfer should round amounts to the nearest second decimal digit (round down),1.12
