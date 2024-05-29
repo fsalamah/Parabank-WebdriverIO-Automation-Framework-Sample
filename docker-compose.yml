@@ -43,9 +43,9 @@ services:
   ChromeService:
     image: selenium/node-chrome:125.0-20240522
     shm_size: 1gb
-    ports:
-      - "5900:5900"
-      - "7900:7900"
+    # ports:
+    #   - "5900:5900"
+    #   - "7900:7900"
     environment:
       - SE_EVENT_BUS_HOST=seleniumHub
       - SE_EVENT_BUS_PUBLISH_PORT=4442

@@ -19,7 +19,6 @@ class CsvReaderUtility {
       const dataRows = this.readCSV<T>(path);
       
       const result = dataRows.filter((r)=>r.isActive.toUpperCase() ==='TRUE');
-      console.log(result)
       return result as T[];
 
      
